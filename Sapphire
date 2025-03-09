@@ -1,0 +1,92 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "DioRUS HUB",
+   Icon = 0,
+   LoadingTitle = "Arm Wrestle Simulator",
+   LoadingSubtitle = "by DiorEЯ",
+   Theme = "Default",
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil,
+      FileName = "Big Hub"
+   },
+
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+
+   KeySystem = true,
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"DiorTop"}
+   }
+})
+
+local Tab = Window:CreateTab("Open Egg")
+
+-- Переменная для отслеживания состояния автооткрытия
+local isPurchasing = false
+local purchaseCoroutine -- Переменная для хранения корутины
+
+-- Функция для покупки яйца
+local function purchaseEgg()
+    task.wait(1) -- Опциональная задержка перед выполнением
+
+    local args = {
+        [1] = "Sapphire", -- Название яйца
+        [2] = nil,
+        [3] = nil,
+        [4] = false,
+        [5] = nil,
+        [6] = true
+    }
+
+    local success, message = pcall(function()
+        return game:GetService("ReplicatedStorage").Packages.Knit.Services.EggService.RF.purchaseEgg:InvokeServer(unpack(args))
+    end)
+
+    if success then
+        print("Egg purchased successfully!")
+    else
+        warn("Failed to purchase egg: " .. tostring(message))
+    end
+end
+
+-- Создание переключателя для автооткрытия яйца
+local Toggle = Tab:CreateToggle({
+   Name = "Sapphire Egg",
+   CurrentValue = false,
+   Flag = "Toggle1",
+   Callback = function(Value)
+       isPurchasing = Value -- Установить состояние автооткрытия
+       if Value then
+           print("Автооткрытие яиц включено.")
+           
+           -- Запускаем корутину для автооткрытия
+           purchaseCoroutine = coroutine.create(function()
+               while isPurchasing do
+                   purchaseEgg() -- Вызов функции покупки яйца
+                   task.wait(0.5) -- Задержка между покупками, чтобы избежать перегрузки сервера
+               end
+           end)
+           
+           coroutine.resume(purchaseCoroutine) -- Запускаем корутину
+       else
+           print("Автооткрытие яиц отключено.")
+           isPurchasing = false -- Останавливаем процесс покупки
+       end
+   end,
+})
+
+Rayfield:Init() -- Завершение инициализации интерфейса
