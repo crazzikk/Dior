@@ -75,7 +75,7 @@ local function clearEggCount()
 end
 
 local function purchaseEgg()
-    task.wait(0.5) 
+    task.wait(1) 
 
     local args = {
         [1] = "Sapphire", 
