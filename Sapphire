@@ -46,14 +46,12 @@ local function antiAFK()
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoid = character:WaitForChild("Humanoid")
 
-    humanoid.WalkSpeed = 0 -- Set walkspeed to 0
-    humanoid.JumpPower = 0 -- Disable jumping
-
-    -- Prevent AFK by resetting position
+    -- Prevent AFK by resetting position without blocking jump
     while true do
         task.wait(30) -- Check every 30 seconds
         if humanoid and humanoid.Health > 0 then
-            humanoid:Move(Vector3.new(0, 0, 0), false) -- Keep the character in place
+            -- Reset position slightly to prevent AFK
+            humanoid:Move(Vector3.new(0.1, 0, 0), false) -- Move slightly to the side
         end
     end
 end
@@ -78,9 +76,9 @@ local function purchaseEgg()
     end)
 
     if success then
-        local isPurchased = message and message == "EggPurchased" -- Adjust based on actual response
+        local isPurchased = message and message == "EggPurchased"
         if isPurchased then
-            eggsOpened = eggsOpened + 1 -- Increment by 1 for each successful egg purchase
+            eggsOpened = eggsOpened + 1
             print("Egg purchased successfully! Total eggs opened: " .. eggsOpened)
         else
             warn("Egg purchase failed or no response.")
@@ -100,7 +98,7 @@ local Toggle = Tab:CreateToggle({
            print("Автооткрытие яиц включено.")
            purchaseCoroutine = coroutine.create(function()
                while isPurchasing do
-                   purchaseEgg() -- Call purchaseEgg only when the toggle is on
+                   purchaseEgg()
                    task.wait(0.2)
                end
            end)
@@ -123,7 +121,7 @@ local DelaySlider = LoopSpeedSection:CreateSlider({
    Range = {0, 100},
    Increment = 1,
    Suffix = " ms",
-   CurrentValue = 50,  -- Initial delay set to 50 milliseconds
+   CurrentValue = 50, 
    Flag = "DelaySlider",
    Callback = function(Value)
        delay = Value / 1000  -- Convert milliseconds to seconds
